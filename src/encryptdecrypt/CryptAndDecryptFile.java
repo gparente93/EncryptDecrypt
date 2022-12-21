@@ -14,55 +14,82 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+/**
+ * Classe che rappresenta un programma per criptare e decriptare file di testo utilizzando l'algoritmo di crittografia
+ * a chiave simmetrica AES (Advanced Encryption Standard).
+ */
 public class CryptAndDecryptFile {
 	
-	private static final String KEY="djfkcfirkedfgkcv";
-
 
     public static void main(String[] args) {
         // Crea la finestra principale e imposta il layout
         JFrame frame = new JFrame("CryptDecryptProgram");
         frame.setLayout(new FlowLayout());
-
+        
+        // Crea un campo per inserire la chiave di criptazione
+        JPasswordField keyField = new JPasswordField(25);
+        frame.add(keyField);
+        
         // Crea i pulsanti per criptare e decriptare
         JButton btnCrypt = new JButton("Crypt");
         JButton btnDecrypt = new JButton("Decrypt");
 
         // Aggiunge i pulsanti alla finestra
+        
         frame.add(btnCrypt);
         frame.add(btnDecrypt);
 
-        // Imposta le dimensioni della finestra e rendila visibile
-        frame.setSize(200, 100);
-        frame.setVisible(true);
+        // Crea una label per l'output
+        JLabel outputLabel = new JLabel(System.lineSeparator() + " ");
+        frame.add(outputLabel);
 
+ 
+        // Imposta le dimensioni della finestra e rendila visibile
+        frame.setSize(350, 150);
+        frame.setVisible(true);
+        
         // Crea un oggetto ActionListener per il pulsante di criptazione
         btnCrypt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Ottieni la chiave di criptazione dal campo di inserimento
+                char[] keyChars = keyField.getPassword();
+                String key = new String(keyChars);
+
                 // Carica la lista di stringhe dal file di input
                 List<String> inputList = loadStringsFromFile("input.txt");
 
                 // Cripta la lista di stringhe
-                List<String> outputList = cryptStrings(inputList);
+                List<String> outputList = cryptStrings(inputList, key);
 
                 // Scrive la lista di stringhe criptate nel file di output
                 writeStringsToFile(outputList, "output.txt");
+
+                // Aggiorna la label di output
+                outputLabel.setText("File criptato con successo! Controlla il contenuto del txt!");
             }
         });
 
-        // Crea un oggetto ActionListener per il pulsante di decriptazione
         btnDecrypt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Ottieni la chiave di criptazione dal campo di inserimento
+                char[] keyChars = keyField.getPassword();
+                String key = new String(keyChars);
+
                 // Carica la lista di stringhe criptate dal file di input
                 List<String> inputList = loadStringsFromFile("output.txt");
 
                 // Decripta la lista di stringhe criptate
-                List<String> outputList = decryptStrings(inputList);
+                List<String> outputList = decryptStrings(inputList, key);
 
                 // Scrive la lista di stringhe decriptate nel file di output
                 writeStringsToFile(outputList, "output.txt");
+
+                // Aggiorna la label di output
+                outputLabel.setText("File decriptato con successo! Controlla il contenuto del txt!");
             }
         });
     }
@@ -95,14 +122,14 @@ public class CryptAndDecryptFile {
     }
     
     // Metodo per criptare una lista di stringhe utilizzando l'algoritmo AES
-    public static List<String> cryptStrings(List<String> stringList) {
+    public static List<String> cryptStrings(List<String> stringList, String inputKey) {
         List<String> cryptedStringList = new ArrayList<>();
         try {
             // Crea un oggetto Cipher per criptare i dati utilizzando l'algoritmo AES
             Cipher cipher = Cipher.getInstance("AES");
 
             // Crea una chiave per l'algoritmo AES
-            Key key = new SecretKeySpec(KEY.getBytes("UTF-8"), "AES");
+            Key key = new SecretKeySpec(inputKey.getBytes("UTF-8"), "AES");
 
             // Inizializza il Cipher per la criptazione
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -126,14 +153,14 @@ public class CryptAndDecryptFile {
     }
     
     // Metodo per decriptare una lista di stringhe criptate utilizzando l'algoritmo AES
-    public static List<String> decryptStrings(List<String> cryptedStringList) {
+    public static List<String> decryptStrings(List<String> cryptedStringList, String inputKey) {
         List<String> decryptedStringList = new ArrayList<>();
         try {
             // Crea un oggetto Cipher per decriptare i dati utilizzando l'algoritmo AES
             Cipher cipher = Cipher.getInstance("AES");
 
             // Crea una chiave per l'algoritmo AES
-            Key key = new SecretKeySpec(KEY.getBytes("UTF-8"), "AES");
+            Key key = new SecretKeySpec(inputKey.getBytes("UTF-8"), "AES");
 
             // Inizializza il Cipher per la decriptazione
             cipher.init(Cipher.DECRYPT_MODE, key);
